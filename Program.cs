@@ -16,7 +16,8 @@ switch (firstArgument)
     case "--help":
         DisplayHelp();
         break;
-    case "-p":
+    case     "-p":
+    case "--path":
         var rootPathArgument = args[1];
         Clean(rootPathArgument);
         break;
@@ -33,16 +34,34 @@ static void Clean(string rootPath)
         return;
     }
 
-    var listOfTempDirectoriesToDelete = GetTempDirectories(rootPath);
+    var listOfTempDirectoriesToDelete = GetTempDirectories(rootPath).ToList();
 
-    foreach (var tempObject in listOfTempDirectoriesToDelete)
+    Console.WriteLine("Do you approve the deletion of these directories? yes to all - [Y], no - [N], ask on every directory - [A]");
+    var approve = Console.ReadLine();
+
+    if (approve.Contains("N", StringComparison.OrdinalIgnoreCase))
+    {
+        return;
+    }
+
+    foreach (var tempDirectory in listOfTempDirectoriesToDelete)
     {
         try
         {
-            Directory.Delete(tempObject, true);
+            if (approve.Contains("A", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine($"Delete \"{tempDirectory}\"? yes - [Y], no - [N]");
+                if (Console.ReadLine().Contains("N", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine($"\"{tempDirectory}\" was skipped");
+                    continue;
+                }
+            }
+            Directory.Delete(tempDirectory, true);
             Console.BackgroundColor = ConsoleColor.Green;
-            Console.WriteLine("Successfully removed!");
+            Console.Write("Successfully removed: ");
             Console.ResetColor();
+            Console.WriteLine(tempDirectory);
         }
         catch (Exception e)
         {
@@ -114,5 +133,5 @@ static void DisplayHelp()
     Console.WriteLine("This is the CLI of the dotnetCleaner tool. Here is the list of supported arguments for it:");
     Console.WriteLine("\t-p {path of the root directory}");
     Console.WriteLine("\t\t The specified directory will be recursively cleaned up from temp files and folders.");
-    Console.WriteLine("\t\t Temp folders are: '/node_modules/', '/build/', '/bin/', '/obj/', '/.vs/', '/dist/'.");
+    Console.WriteLine("\t\t Temp folders are: '/node_modules/', '/build/', '/bin/', '/obj/', '/.vs/'.");
 }
