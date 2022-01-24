@@ -5,7 +5,21 @@ string firstArgument;
 if (args.Length == 0)
 {
     var input = Console.ReadLine()!;
-    args = input.Split(" ");
+    if (input.Contains("\""))
+    {
+        firstArgument = input.Split(" ")[0];
+        var indexOfArgumentValue = input.IndexOf("\"");
+        var secondArgument = input[indexOfArgumentValue..];
+        args = new[]
+        {
+            firstArgument,
+            secondArgument.Trim('\"')
+        };
+    }
+    else
+    {
+        args = input.Split(" ");
+    }
 }
 
 firstArgument = args[0];
