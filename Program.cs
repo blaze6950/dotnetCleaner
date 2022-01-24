@@ -26,6 +26,9 @@ switch (firstArgument)
         break;
 }
 
+Console.WriteLine("For closing the app press any key");
+Console.ReadKey();
+
 static void Clean(string rootPath)
 {
     if (!Directory.Exists(rootPath))
